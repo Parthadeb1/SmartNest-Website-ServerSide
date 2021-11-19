@@ -25,12 +25,19 @@ async function run() {
     const packageCollection = database.collection("packages");
     const orderCollection = database.collection("order");
     const usersCollection = database.collection("users");
+    const reviewCollection = database.collection("reviews")
 
     //get api
     app.get("/packages", async (req, res) => {
       const packages = await packageCollection.find({}).toArray();
       res.send(packages);
     });
+
+    //get reviews api
+    app.get('/reviews', async(req,res)=>{
+      const result = await reviewCollection.find({}).toArray();
+      res.send(result);
+    })
 
     //get single package
     app.get("/packages/:id", async (req, res) => {
@@ -80,10 +87,18 @@ async function run() {
       const package = req.body;
       console.log('add package', package);
       const result = await packageCollection.insertOne(package);
-      console.log(result);
-
       res.json(result);
     })
+
+    //add review post api
+    app.post('/reviews', async (req, res)=>{
+      const review = req.body;
+      // console.log('review added', review);
+      const result = await reviewCollection.insertOne(review);
+      console.log(result)
+      res.json(result);
+    })
+
 
     
 
@@ -101,6 +116,14 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
+      res.json(result);
+    });
+
+    //delete manage all products
+    app.delete("/packages/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await packageCollection.deleteOne(query);
       res.json(result);
     });
 
